@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RotaMoto | Motor Türüne Özel Rotalar & Motorcu Mola Noktaları</title>
+    <meta name="description" content="Cross, Enduro, Racing, Naked ve Adventure motor tiplerine özel virajlı rotalar, motorcu mola kahveleri, pitstoplar ve GPX indirme platformu.">
+    
+    <!-- Google Fonts & FontAwesome Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    
+    <!-- Custom Style CSS -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <!-- Header Navigation -->
+    <header class="header" id="header">
+        <div class="header-container">
+            <a href="#" class="logo" id="mainLogo">
+                <div class="logo-icon"><i class="fa-solid fa-motorcycle"></i></div>
+                <div class="logo-text">ROTA<span>MOTO</span></div>
+            </a>
+
+            <nav>
+                <ul class="nav-links">
+                    <li><a href="#bikeTypeSection" class="nav-link active" id="navMotorTypes" data-i18n="navMotorTypes"><i class="fa-solid fa-gauge-high"></i> Motor Türleri</a></li>
+                    <li><a href="#mapSection" class="nav-link" id="navMapLink" data-i18n="navMapLink"><i class="fa-solid fa-earth-americas"></i> Dünya Haritası</a></li>
+                    <li><a href="#routesSection" class="nav-link" id="navRoutesLink" data-i18n="navRoutesLink"><i class="fa-solid fa-compass"></i> Rotalar & Mola Mekanları</a></li>
+                    <li><a href="javascript:void(0)" onclick="openRouteBuilderModal()" class="nav-link" id="navBuilderLink" data-i18n="navBuilderLink"><i class="fa-solid fa-route"></i> Rota Çiz</a></li>
+                    <li><a href="#memberReviewsSection" class="nav-link" id="navReviewsLink" data-i18n="navRideScores"><i class="fa-solid fa-trophy"></i> Sürüş Puanları</a></li>
+                </ul>
+            </nav>
+
+            <div class="header-actions">
+                <!-- Steam Style Language Dropdown Menu -->
+                <div class="lang-dropdown-wrapper" id="langDropdownWrapper">
+                    <button class="lang-dropdown-btn" id="langDropdownBtn" onclick="toggleLangDropdown(event)">
+                        <span id="langDropdownCurrent">TR</span>
+                        <i class="fa-solid fa-chevron-down lang-chevron"></i>
+                    </button>
+                    <div class="lang-dropdown-menu" id="langDropdownMenu">
+                        <div class="lang-dropdown-item active" data-lang="tr" onclick="selectLanguageOption('tr', 'TR', 'Türkçe')">
+                            <span>Türkçe</span>
+                            <i class="fa-solid fa-check lang-check"></i>
+                        </div>
+                        <div class="lang-dropdown-item" data-lang="en" onclick="selectLanguageOption('en', 'EN', 'English')">
+                            <span>English</span>
+                            <i class="fa-solid fa-check lang-check"></i>
+                        </div>
+                        <div class="lang-dropdown-item" data-lang="de" onclick="selectLanguageOption('de', 'DE', 'Deutsch (German)')">
+                            <span>Deutsch (German)</span>
+                            <i class="fa-solid fa-check lang-check"></i>
+                        </div>
+                        <div class="lang-dropdown-item" data-lang="zh" onclick="selectLanguageOption('zh', 'ZH', '中文 (Chinese)')">
+                            <span>中文 (Chinese)</span>
+                            <i class="fa-solid fa-check lang-check"></i>
+                        </div>
+                        <div class="lang-dropdown-item" data-lang="es" onclick="selectLanguageOption('es', 'ES', 'Español (Spanish)')">
+                            <span>Español (Spanish)</span>
+                            <i class="fa-solid fa-check lang-check"></i>
+                        </div>
+                        <div class="lang-dropdown-item" data-lang="fr" onclick="selectLanguageOption('fr', 'FR', 'Français (French)')">
+                            <span>Français (French)</span>
+                            <i class="fa-solid fa-check lang-check"></i>
+                        </div>
+                        <div class="lang-dropdown-item" data-lang="it" onclick="selectLanguageOption('it', 'IT', 'Italiano (Italian)')">
+                            <span>Italiano (Italian)</span>
+                            <i class="fa-solid fa-check lang-check"></i>
+                        </div>
+                        <div class="lang-dropdown-item" data-lang="ru" onclick="selectLanguageOption('ru', 'RU', 'Русский (Russian)')">
+                            <span>Русский (Russian)</span>
+                            <i class="fa-solid fa-check lang-check"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Dark / Light Theme Switcher Button (Web.dev Animated Sun & Moon) -->
+                <button class="theme-toggle-btn" id="themeToggleBtn" onclick="toggleTheme()" title="Temayı Değiştir" aria-label="Temayı Değiştir">
+                    <svg class="sun-and-moon" aria-hidden="true" width="22" height="22" viewBox="0 0 24 24">
+                        <mask class="moon" id="moon-mask">
+                            <rect x="0" y="0" width="100%" height="100%" fill="white" />
+                            <circle cx="24" cy="10" r="6" fill="black" />
+                        </mask>
+                        <circle class="sun" cx="12" cy="12" r="6" mask="url(#moon-mask)" fill="currentColor" />
+                        <g class="sun-beams" stroke="currentColor">
+                            <line x1="12" y1="1" x2="12" y2="3" />
+                            <line x1="12" y1="21" x2="12" y2="23" />
+                            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+                            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+                            <line x1="1" y1="12" x2="3" y2="12" />
+                            <line x1="21" y1="12" x2="23" y2="12" />
+                            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+                            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+                        </g>
+                    </svg>
+                </button>
+
+                <!-- Rider Auth & Profile Container -->
+                <div id="headerAuthActions"></div>
+
+                <button onclick="openRouteBuilderModal()" class="btn btn-primary" id="createRouteHeaderBtn" data-i18n="createRouteBtn">
+                    <i class="fa-solid fa-plus"></i> Rota Oluştur
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero" id="heroSection">
+        <div class="hero-content">
+            <div class="hero-badge" data-i18n="heroBadge">
+                <i class="fa-solid fa-fire"></i> Motovlog & Instagram Favorisi Rotalar
+            </div>
+            <h1 class="hero-title">
+                <span data-i18n="heroTitleText">Sürüş Tarzına Özel</span> <span data-i18n="heroTitleSpan">Rotalar & Mola Durakları.</span>
+            </h1>
+            <p class="hero-desc" data-i18n="heroDesc">
+                <strong>Naked & Streetfighter</strong> motorcular için çevik Mudanya & Şile virajları, <strong>Cross / Enduro</strong> için dağ patikaları, <strong>Racing</strong> için pist tadında sıcak asfalt! Rota üzerindeki <strong>motorcu kahveleri ve pitstop mola yerleri</strong> ile sürüşün keyfini çıkarın.
+            </p>
+            <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                <a href="#bikeTypeSection" class="btn btn-primary" data-i18n="heroBtnSelectBike">
+                    <i class="fa-solid fa-motorcycle"></i> Motor Türünü Seç
+                </a>
+                <a href="#mapSection" class="btn btn-secondary" data-i18n="heroBtnMap">
+                    <i class="fa-solid fa-mug-hot"></i> Mola Mekanları Haritası
+                </a>
+            </div>
+        </div>
+
+        <div class="hero-media">
+            <img src="assets/naked_bike.jpg" alt="Naked Motor Rotası Görseli" class="hero-img" />
+            <div class="hero-media-overlay">
+                <div class="hero-media-card">
+                    <div>
+                        <h4 style="font-family: var(--font-heading); color: #fff; font-size: 1.1rem; margin-bottom: 2px;" data-i18n="featuredRouteTitle">Mudanya - Tirilye Virajları</h4>
+                        <p style="font-size: 0.82rem; color: var(--text-muted);" data-i18n="featuredRouteDesc">🛵 Naked Motor Özel Rotası • ☕ Tirilye Motorcu Kahvesi Mola Duraklı</p>
+                    </div>
+                    <button class="btn btn-outline" style="padding: 0.4rem 0.8rem; font-size: 0.8rem;" onclick="openRouteModal('mudanya-tirilye-naked')" data-i18n="featuredRouteBtn">
+                        İncele
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Motorcycle Category Selector Section -->
+    <section class="bike-type-section" id="bikeTypeSection">
+        <div class="bike-type-header">
+            <h2 data-i18n="bikeTypeHeaderTitle"><i class="fa-solid fa-helmet-safety" style="color: var(--primary);"></i> Hangi Motosikleti Sürüyorsunuz?</h2>
+            <p data-i18n="bikeTypeHeaderDesc">Sürüş tarzınıza ve motosiklet tipinize uygun özel zemin, viraj ve mola mekanlı rotaları süzün.</p>
+        </div>
+
+        <div class="bike-type-grid">
+            <button class="bike-tab-btn active" data-category="all" onclick="setBikeCategoryFilter('all')">
+                <i class="fa-solid fa-globe bike-tab-icon"></i>
+                <div class="bike-tab-title" data-i18n="tabAllTitle">Tüm Rotalar</div>
+                <div class="bike-tab-desc" data-i18n="tabAllDesc">Tüm küresel & yerel rotalar</div>
+            </button>
+
+            <button class="bike-tab-btn" data-category="touring-chopper" onclick="setBikeCategoryFilter('touring-chopper')">
+                <i class="fa-solid fa-motorcycle bike-tab-icon" style="color: #ff9100;"></i>
+                <div class="bike-tab-title" data-i18n="tabNakedTitle">Naked / Streetfighter</div>
+                <div class="bike-tab-desc" data-i18n="tabNakedDesc">Çevik virajlar, rüzgar korumasız orta mesafeler & motorcu kahveleri</div>
+            </button>
+
+            <button class="bike-tab-btn" data-category="racing" onclick="setBikeCategoryFilter('racing')">
+                <i class="fa-solid fa-gauge-high bike-tab-icon" style="color: #d50000;"></i>
+                <div class="bike-tab-title" data-i18n="tabRacingTitle">Racing / Supersport</div>
+                <div class="bike-tab-desc" data-i18n="tabRacingDesc">Pürüzsüz sıcak asfalt & keskin viraj serileri</div>
+            </button>
+
+            <button class="bike-tab-btn" data-category="cross-enduro" onclick="setBikeCategoryFilter('cross-enduro')">
+                <i class="fa-solid fa-mountain bike-tab-icon" style="color: #2e7d32;"></i>
+                <div class="bike-tab-title" data-i18n="tabCrossTitle">Cross / Enduro</div>
+                <div class="bike-tab-desc" data-i18n="tabCrossDesc">Dağlık arazi, toprak, mıcır & çamur patikaları</div>
+            </button>
+
+            <button class="bike-tab-btn" data-category="adventure" onclick="setBikeCategoryFilter('adventure')">
+                <i class="fa-solid fa-compass bike-tab-icon" style="color: #0288d1;"></i>
+                <div class="bike-tab-title" data-i18n="tabAdventureTitle">Adventure / Touring</div>
+                <div class="bike-tab-desc" data-i18n="tabAdventureDesc">Uzun yol, dağ geçitleri & kamp durakları</div>
+            </button>
+        </div>
+    </section>
+
+    <!-- Search & Filter Toolbar Section -->
+    <section class="filter-bar-section" id="filterBarSection">
+        <div class="filter-card">
+            <div class="search-box">
+                <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                <input type="text" id="searchInput" class="search-input" data-i18n-placeholder="searchPlaceholder" placeholder="Naked, Cross, Racing, Şile, Mudanya, Stelvio veya mola yeri ara..." />
+            </div>
+
+            <div class="filter-select-group">
+                <select id="filterRegion" class="filter-select">
+                    <option value="all" data-i18n="filterAllCountries">Tüm Ülkeler</option>
+                    <option value="Türkiye" data-i18n="filterTurkey">Türkiye 🇹🇷</option>
+                    <option value="İtalya" data-i18n="filterItaly">İtalya 🇮🇹</option>
+                    <option value="Romanya" data-i18n="filterRomania">Romanya 🇷🇴</option>
+                    <option value="ABD" data-i18n="filterUSA">ABD 🇺🇸</option>
+                    <option value="Fas" data-i18n="filterMorocco">Fas 🇲🇦</option>
+                    <option value="Norveç" data-i18n="filterNorway">Norveç 🇳🇴</option>
+                    <option value="Avusturya" data-i18n="filterAustria">Avusturya 🇦🇹</option>
+                </select>
+
+                <select id="filterDifficulty" class="filter-select">
+                    <option value="all" data-i18n="filterAllDifficulties">Tüm Zorluk Seviyeleri</option>
+                    <option value="Başlangıç" data-i18n="filterBeginner">Başlangıç Seviye</option>
+                    <option value="Orta" data-i18n="filterMedium">Orta Seviye</option>
+                    <option value="Usta" data-i18n="filterMaster">Usta Seviye</option>
+                    <option value="Efsane" data-i18n="filterLegendary">Efsane Seviye</option>
+                </select>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Section: Interactive Leaflet Map -->
+    <main class="main-container">
+        <div class="section-header" id="mapSection">
+            <div>
+                <h2 class="section-title" data-i18n="mapSectionTitle"><i class="fa-solid fa-earth-americas"></i> Harita & Motorcu Mola Noktaları</h2>
+                <p style="color: var(--text-muted); font-size: 0.9rem;" data-i18n="mapSectionDesc">Haritadaki ☕ (Çay/Kahve Molası), ⛽ (İkmal) ve 📸 (Seyir Noktası) pinlerine tıklayarak motorcu buluşma yerlerini görün.</p>
+            </div>
+        </div>
+
+        <div class="map-wrapper">
+            <div id="leafletMap"></div>
+        </div>
+
+        <!-- Route Cards Grid -->
+        <div class="section-header" id="routesSection">
+            <div>
+                <h2 class="section-title" data-i18n="routesSectionTitle"><i class="fa-solid fa-route"></i> Motor Türüne Özel Rotalar</h2>
+                <p style="color: var(--text-muted); font-size: 0.9rem;" id="activeRouteCount">Rotalar listeleniyor...</p>
+            </div>
+        </div>
+
+        <div class="routes-grid" id="routesGrid">
+            <!-- Dynamic Route Cards injected by app.js -->
+        </div>
+
+        <!-- Member Reviews Section by Bike Type -->
+        <section id="memberReviewsSection" style="margin-top: 4rem;">
+            <div class="section-header">
+                <div>
+                    <h2 class="section-title"><i class="fa-solid fa-trophy" style="color: var(--accent-gold);"></i> Üye Sürücü Sürüş Sıralaması</h2>
+                    <p style="color: var(--text-muted); font-size: 0.9rem;">Motor türüne göre rota sürüş süreleri & XP puan sıralaması</p>
+                </div>
+            </div>
+
+            <!-- Bike Type Tabs for Reviews -->
+            <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1.8rem;">
+                <button class="review-category-tab active" data-cat="all" onclick="filterMemberReviews('all', this)" style="padding: 0.5rem 1.1rem; border-radius: 2rem; border: 1.5px solid var(--primary); background: var(--primary); color: #fff; font-weight: 700; font-size: 0.85rem; cursor: pointer; transition: all 0.2s;">
+                    <i class="fa-solid fa-globe"></i> Tüm Sıralamalar
+                </button>
+                <button class="review-category-tab" data-cat="touring-chopper" onclick="filterMemberReviews('touring-chopper', this)" style="padding: 0.5rem 1.1rem; border-radius: 2rem; border: 1.5px solid rgba(255,107,0,0.4); background: transparent; color: var(--text-muted); font-weight: 600; font-size: 0.85rem; cursor: pointer; transition: all 0.2s;">
+                    🛵 Naked / Streetfighter
+                </button>
+                <button class="review-category-tab" data-cat="racing" onclick="filterMemberReviews('racing', this)" style="padding: 0.5rem 1.1rem; border-radius: 2rem; border: 1.5px solid rgba(213,0,0,0.35); background: transparent; color: var(--text-muted); font-weight: 600; font-size: 0.85rem; cursor: pointer; transition: all 0.2s;">
+                    🏎️ Racing / Supersport
+                </button>
+                <button class="review-category-tab" data-cat="cross-enduro" onclick="filterMemberReviews('cross-enduro', this)" style="padding: 0.5rem 1.1rem; border-radius: 2rem; border: 1.5px solid rgba(46,125,50,0.4); background: transparent; color: var(--text-muted); font-weight: 600; font-size: 0.85rem; cursor: pointer; transition: all 0.2s;">
+                    🏔️ Cross / Enduro
+                </button>
+                <button class="review-category-tab" data-cat="adventure" onclick="filterMemberReviews('adventure', this)" style="padding: 0.5rem 1.1rem; border-radius: 2rem; border: 1.5px solid rgba(2,136,209,0.35); background: transparent; color: var(--text-muted); font-weight: 600; font-size: 0.85rem; cursor: pointer; transition: all 0.2s;">
+                    🧳 Adventure / Touring
+                </button>
+            </div>
+
+            <div id="memberReviewsGrid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1.2rem;">
+                <!-- Dynamically rendered by app.js -->
+            </div>
+        </section>
+
+        <!-- Clean Call-To-Action Banner for Route Builder (Main page stays neat & uncluttered) -->
+        <div class="builder-cta-banner">
+            <div class="builder-cta-content">
+                <div class="builder-cta-icon">
+                    <i class="fa-solid fa-pen-ruler"></i>
+                </div>
+                <div>
+                    <h3 class="builder-cta-title" data-i18n="builderCtaTitle">Kendi Motosiklet Rotanı Çizmek İster misin?</h3>
+                    <p class="builder-cta-desc" data-i18n="builderCtaDesc">Haritada harici tam ekran rota çiziciyi açın, duraklarınızı belirleyin, gerçek karayolu navigasyonuyla rotanızı oluşturup GPX olarak indirin!</p>
+                </div>
+            </div>
+            <button class="btn btn-primary" style="padding: 0.85rem 1.8rem; font-size: 1rem; border-radius: var(--radius-md);" onclick="openRouteBuilderModal()" data-i18n="builderCtaBtn">
+                <i class="fa-solid fa-route"></i> Rota Çiziciyi Aç
+            </button>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-container">
+            <!-- Brand & Description -->
+            <div class="footer-col" style="flex: 1.4; min-width: 280px;">
+                <a href="#" class="logo" style="margin-bottom: 0.85rem; display: inline-flex;">
+                    <div class="logo-icon"><i class="fa-solid fa-motorcycle"></i></div>
+                    <div class="logo-text">ROTA<span>MOTO</span></div>
+                </a>
+                <p style="font-size: 0.88rem; color: var(--text-muted); line-height: 1.6; margin-bottom: 1.2rem;" data-i18n="footerDesc">
+                    Naked, Cross, Racing ve Adventure motor sürücüleri için rota ve mola mekanı buluşma platformu.
+                </p>
+                <div style="display: flex; gap: 0.6rem; flex-wrap: wrap;">
+                    <a href="https://instagram.com" target="_blank" rel="noopener" class="btn btn-secondary" style="padding: 0.45rem 0.75rem; border-radius: 8px; font-size: 0.82rem;" title="Instagram">
+                        <i class="fa-brands fa-instagram" style="color: #e1306c;"></i> Instagram
+                    </a>
+                    <a href="https://youtube.com" target="_blank" rel="noopener" class="btn btn-secondary" style="padding: 0.45rem 0.75rem; border-radius: 8px; font-size: 0.82rem;" title="YouTube Motovlog">
+                        <i class="fa-brands fa-youtube" style="color: #ff0000;"></i> Motovlog
+                    </a>
+                </div>
+            </div>
+
+            <!-- Quick Navigation Links -->
+            <div class="footer-col">
+                <h4 data-i18n="footerQuickLinks"><i class="fa-solid fa-compass" style="color: var(--primary);"></i> Hızlı Bağlantılar</h4>
+                <ul class="footer-links">
+                    <li><a href="#bikeTypeSection"><i class="fa-solid fa-angle-right" style="font-size: 0.75rem; color: var(--primary);"></i> Motor Türleri</a></li>
+                    <li><a href="#mapSection"><i class="fa-solid fa-angle-right" style="font-size: 0.75rem; color: var(--primary);"></i> Dünya Haritası</a></li>
+                    <li><a href="#routesSection"><i class="fa-solid fa-angle-right" style="font-size: 0.75rem; color: var(--primary);"></i> Rotalar & Mekanlar</a></li>
+                    <li><a href="javascript:void(0)" onclick="openRouteBuilderModal()"><i class="fa-solid fa-angle-right" style="font-size: 0.75rem; color: var(--primary);"></i> Kendi Rotanı Çiz</a></li>
+                    <li><a href="#memberReviewsSection"><i class="fa-solid fa-angle-right" style="font-size: 0.75rem; color: var(--primary);"></i> Sürüş Puanları</a></li>
+                </ul>
+            </div>
+
+            <!-- Motorcycle Categories -->
+            <div class="footer-col">
+                <h4><i class="fa-solid fa-gauge-high" style="color: var(--primary);"></i> Motosiklet Türleri</h4>
+                <ul class="footer-links">
+                    <li><a href="javascript:void(0)" onclick="setBikeCategoryFilter('touring-chopper')"><i class="fa-solid fa-motorcycle" style="font-size: 0.8rem; color: var(--accent-orange);"></i> Naked / Streetfighter</a></li>
+                    <li><a href="javascript:void(0)" onclick="setBikeCategoryFilter('racing')"><i class="fa-solid fa-flag-checkered" style="font-size: 0.8rem; color: #ff3344;"></i> Racing / Supersport</a></li>
+                    <li><a href="javascript:void(0)" onclick="setBikeCategoryFilter('cross-enduro')"><i class="fa-solid fa-mountain" style="font-size: 0.8rem; color: #10b981;"></i> Cross / Enduro</a></li>
+                    <li><a href="javascript:void(0)" onclick="setBikeCategoryFilter('adventure')"><i class="fa-solid fa-earth-americas" style="font-size: 0.8rem; color: #0288d1;"></i> Adventure / Touring</a></li>
+                </ul>
+            </div>
+
+            <!-- Safe Riding & Community -->
+            <div class="footer-col" style="flex: 1.2; min-width: 250px;">
+                <h4 data-i18n="footerSafetyTitle"><i class="fa-solid fa-shield-halved" style="color: #10b981;"></i> Güvenli Sürüş</h4>
+                <div style="background: var(--bg-dark); border: 1px solid var(--border-glass); border-radius: var(--radius-md); padding: 0.9rem; margin-bottom: 0.8rem;">
+                    <p style="font-size: 0.84rem; color: var(--text-muted); line-height: 1.5;" data-i18n="footerSafetyDesc">
+                        Mola yerlerinde sohbet ederken kask ve eldivenlerinizi güvenli yere bırakın, sürüşte ekipmanlarınızı tam giyin.
+                    </p>
+                </div>
+                <div style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.8rem; color: var(--text-dim);">
+                    <i class="fa-solid fa-heart" style="color: #ff3344;"></i>
+                    <span>Tüm iki teker tutkunları için sevgiyle geliştirildi.</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <span data-i18n="footerRights">© 2026 RotaMoto - Motor Türüne Özel Rota Platformu. Tüm hakları saklıdır.</span>
+        </div>
+    </footer>
+
+    <!-- Modal Backdrop & Modal Container for Route Details -->
+    <div class="modal-backdrop" id="modalBackdrop">
+        <div class="modal-container" id="modalContainer">
+            <!-- Modal Content Dynamically Injected -->
+        </div>
+    </div>
+
+    <!-- Standalone Route Builder Modal Backdrop -->
+    <div class="modal-backdrop" id="builderModalBackdrop">
+        <div class="modal-container builder-modal-container" id="builderModalContainer">
+            <div class="builder-modal-header">
+                <div style="display: flex; align-items: center; gap: 0.8rem;">
+                    <div class="logo-icon" style="width: 38px; height: 38px; font-size: 1.15rem; flex-shrink: 0;"><i class="fa-solid fa-route"></i></div>
+                    <div>
+                        <h3 style="font-family: var(--font-heading); font-size: 1.25rem; font-weight: 800; color: var(--text-main); margin-bottom: 2px;" data-i18n="builderSectionTitle">Kendi Motosiklet Rotanı Çiz</h3>
+                        <p style="font-size: 0.82rem; color: var(--text-muted);" data-i18n="builderSectionDesc">Noktaları haritada işaretleyin, gerçek karayolu rotanız otomatik çizilsin ve GPX olarak indirin!</p>
+                    </div>
+                </div>
+                <button class="modal-close-btn" onclick="closeRouteBuilderModal()" title="Kapat"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+
+            <div class="builder-modal-body">
+                <div class="builder-layout">
+                    <div class="builder-map-container">
+                        <div id="builderMap" style="width: 100%; height: 100%;"></div>
+                    </div>
+
+                    <div class="builder-panel">
+                        <h4 style="font-family: var(--font-heading); font-size: 1.1rem; color: var(--primary);" data-i18n="builderPanelTitle">Rota Detayları</h4>
+                        
+                        <div class="form-group">
+                            <label class="form-label" for="newRouteTitle" data-i18n="builderInputTitle">Rota Başlığı</label>
+                            <input type="text" id="newRouteTitle" class="form-input" placeholder="Örn: İzmir Karaburun Naked Rotası" />
+                        </div>
+
+                        <!-- Motor Türü Seçici -->
+                        <div class="form-group">
+                            <label class="form-label" for="newRouteBikeType" data-i18n="builderInputBikeType">Motor Türü</label>
+                            <select id="newRouteBikeType" class="form-select">
+                                <option value="touring-chopper">🛵 Naked / Streetfighter</option>
+                                <option value="racing">🏎️ Racing / Supersport</option>
+                                <option value="cross-enduro">🏔️ Cross / Enduro / Off-Road</option>
+                                <option value="adventure">🧳 Adventure / Touring</option>
+                            </select>
+                        </div>
+
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem;">
+                            <div class="form-group">
+                                <label class="form-label" for="newRouteRegion" data-i18n="builderInputRegion">Bölge / Şehir</label>
+                                <select id="newRouteRegion" class="form-select">
+                                    <option value="Türkiye 🇹🇷">Türkiye 🇹🇷</option>
+                                    <option value="İtalya 🇮🇹">İtalya 🇮🇹</option>
+                                    <option value="Romanya 🇷🇴">Romanya 🇷🇴</option>
+                                    <option value="Diğer Dünya">Diğer Dünya</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label" for="newRouteDifficulty" data-i18n="builderInputDifficulty">Zorluk</label>
+                                <select id="newRouteDifficulty" class="form-select">
+                                    <option value="Başlangıç">Başlangıç</option>
+                                    <option value="Orta" selected>Orta</option>
+                                    <option value="Usta">Usta</option>
+                                    <option value="Efsane">Efsane</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Haritada Tıklanacak Nokta & Dinlenme Alanı Tipi -->
+                        <div class="form-group" style="background: rgba(255, 107, 0, 0.06); border: 1px dashed rgba(255, 107, 0, 0.3); padding: 0.7rem; border-radius: var(--radius-sm);">
+                            <label class="form-label" for="builderPointType" style="color: var(--primary); display: flex; align-items: center; gap: 4px;" data-i18n="builderPointTypeLabel">
+                                <i class="fa-solid fa-location-dot"></i> İşaretlenecek Nokta Türü
+                            </label>
+                            <select id="builderPointType" class="form-select" style="border-color: rgba(255, 107, 0, 0.4); font-weight: 600;">
+                                <option value="normal" data-i18n="pointTypeNormal">📍 Normal Yol Durağı</option>
+                                <option value="rest" data-i18n="pointTypeRest">🛋️ Dinlenme & Mola Alanı</option>
+                                <option value="cafe" data-i18n="pointTypeCafe">☕ Motorcu Kahvesi & Çay Molası</option>
+                                <option value="gas" data-i18n="pointTypeGas">⛽ Benzinlik & İkmal Noktası</option>
+                                <option value="viewpoint" data-i18n="pointTypeViewpoint">📸 Manzara & Seyir Noktası</option>
+                                <option value="camp" data-i18n="pointTypeCamp">⛺ Kamp & Konaklama Yeri</option>
+                            </select>
+                        </div>
+
+                        <div style="background: var(--bg-dark); border: 1px solid var(--border-glass); border-radius: var(--radius-sm); padding: 0.8rem; display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <span style="font-size: 0.75rem; color: var(--text-dim); display: block;" data-i18n="builderDistLabel">Tahmini Mesafe</span>
+                                <strong id="builderDistance" style="font-family: var(--font-heading); color: var(--primary); font-size: 1.1rem;">0.0 km</strong>
+                            </div>
+                            <div>
+                                <span style="font-size: 0.75rem; color: var(--text-dim); display: block;" data-i18n="builderStopsLabel">Durak Sayısı</span>
+                                <strong id="builderPointCount" style="font-family: var(--font-heading); color: var(--text-main); font-size: 1.1rem;">0 Durak</strong>
+                            </div>
+                        </div>
+
+                        <!-- Durak Listesi (Eklenen Noktalar) -->
+                        <div class="form-group">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <label class="form-label" data-i18n="builderWaypointsHeader">Eklenen Duraklar</label>
+                                <button type="button" onclick="removeLastWaypoint()" class="btn-text-danger" style="font-size: 0.75rem; cursor: pointer; background: transparent; border: none; color: #ff5252; display: flex; align-items: center; gap: 4px;" data-i18n="builderRemoveLastBtn">
+                                    <i class="fa-solid fa-delete-left"></i> Son Noktayı Sil
+                                </button>
+                            </div>
+                            <div id="builderWaypointList" class="builder-waypoint-list">
+                                <div class="builder-empty-list">
+                                    <i class="fa-solid fa-map-pin"></i>
+                                    <span data-i18n="builderNoStops">Haritada tıklayarak durak noktaları ekleyin.</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div style="display: flex; gap: 0.5rem; margin-top: auto; flex-wrap: wrap;">
+                            <button class="btn btn-secondary" style="flex: 1; min-width: 90px;" onclick="removeLastWaypoint()" data-i18n="builderRemoveLastBtn">
+                                <i class="fa-solid fa-delete-left"></i> Geri Al
+                            </button>
+                            <button class="btn btn-secondary" style="flex: 1; min-width: 90px;" onclick="resetBuilder()" data-i18n="builderResetBtn">
+                                <i class="fa-solid fa-rotate-left"></i> Sıfırla
+                            </button>
+                            <button class="btn btn-primary" style="flex: 2; min-width: 140px;" onclick="saveUserCreatedRoute()" data-i18n="builderSaveBtn">
+                                <i class="fa-solid fa-floppy-disk"></i> Kaydet
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+    <!-- Auth Modal Backdrop (Giriş Yap / Kayıt Ol) -->
+    <div class="modal-backdrop" id="authModalBackdrop">
+        <div class="modal-container" style="max-width: 440px; padding: 1.8rem;">
+            <button class="modal-close-btn" onclick="closeAuthModal()"><i class="fa-solid fa-xmark"></i></button>
+
+            <div style="text-align: center; margin-bottom: 1.5rem;">
+                <div class="logo-icon" style="margin: 0 auto 0.8rem auto;"><i class="fa-solid fa-motorcycle"></i></div>
+                <h3 style="font-family: var(--font-heading); font-size: 1.5rem; font-weight: 800; color: var(--text-main);">Sürücü Kulübüne Katılın</h3>
+                <p style="font-size: 0.85rem; color: var(--text-muted);">Sürüş sürelerinizi kaydedin, liderlik tablosunda yarışın ve XP puan kazanın!</p>
+            </div>
+
+            <!-- Auth Tabs -->
+            <div class="auth-tabs">
+                <button class="auth-tab-btn active" id="tabLoginBtn" onclick="switchAuthTab('login')">Giriş Yap</button>
+                <button class="auth-tab-btn" id="tabRegisterBtn" onclick="switchAuthTab('register')">Kayıt Ol</button>
+            </div>
+
+            <!-- Login Form (İsim + Şifre) -->
+            <form id="authLoginForm" onsubmit="handleAuthLogin(event, this)">
+                <div class="form-group" style="margin-bottom: 0.9rem;">
+                    <label class="form-label" for="loginIdentifier">
+                        <i class="fa-solid fa-user" style="color: var(--primary); margin-right: 4px;"></i> İsim / Sürücü Adı
+                    </label>
+                    <input type="text" id="loginIdentifier" name="identifier" class="form-input" required placeholder="Örn: Can 'Rider' Yılmaz" value="Can 'Rider' Yılmaz" autocomplete="username" />
+                </div>
+                <div class="form-group" style="margin-bottom: 1.2rem;">
+                    <label class="form-label" for="loginPassword">
+                        <i class="fa-solid fa-lock" style="color: var(--primary); margin-right: 4px;"></i> Şifre
+                    </label>
+                    <div class="password-input-wrapper">
+                        <input type="password" id="loginPassword" name="password" class="form-input" required placeholder="••••••••" value="123" autocomplete="current-password" />
+                        <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('loginPassword', this)" title="Şifreyi Göster/Gizle" aria-label="Şifreyi Göster/Gizle">
+                            <i class="fa-solid fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center;">
+                    <i class="fa-solid fa-right-to-bracket"></i> Giriş Yap
+                </button>
+            </form>
+
+            <!-- Register Form (Mail + İsim + Şifre) -->
+            <form id="authRegisterForm" style="display: none;" onsubmit="handleAuthRegister(event, this)">
+                <div class="form-group" style="margin-bottom: 0.85rem;">
+                    <label class="form-label" for="registerEmail">
+                        <i class="fa-solid fa-envelope" style="color: var(--primary); margin-right: 4px;"></i> E-Posta (Mail)
+                    </label>
+                    <input type="email" id="registerEmail" name="email" class="form-input" required placeholder="ornek@rotamoto.com" autocomplete="email" />
+                </div>
+                <div class="form-group" style="margin-bottom: 0.85rem;">
+                    <label class="form-label" for="registerUsername">
+                        <i class="fa-solid fa-user-tag" style="color: var(--primary); margin-right: 4px;"></i> İsim (Sürücü Adı)
+                    </label>
+                    <input type="text" id="registerUsername" name="username" class="form-input" required placeholder="Örn: Burak Yılmaz veya Apex Rider" autocomplete="name" />
+                </div>
+                <div class="form-group" style="margin-bottom: 1.2rem;">
+                    <label class="form-label" for="registerPassword">
+                        <i class="fa-solid fa-key" style="color: var(--primary); margin-right: 4px;"></i> Şifre
+                    </label>
+                    <div class="password-input-wrapper">
+                        <input type="password" id="registerPassword" name="password" class="form-input" required minlength="3" placeholder="••••••••" autocomplete="new-password" />
+                        <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('registerPassword', this)" title="Şifreyi Göster/Gizle" aria-label="Şifreyi Göster/Gizle">
+                            <i class="fa-solid fa-eye"></i>
+                        </button>
+                    </div>
+                    <div style="margin-top: 0.45rem; font-size: 0.76rem; color: var(--text-muted); display: flex; align-items: center; gap: 0.4rem;">
+                        <i class="fa-solid fa-shield-halved" style="color: #10b981;"></i>
+                        <span>Şifreniz <strong>SHA-256</strong> hash yasasına uygun şekilde şifrelenerek saklanır.</span>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center;">
+                    <i class="fa-solid fa-user-plus"></i> Kayıt Ol & Başla
+                </button>
+            </form>
+
+            <div style="margin-top: 1.5rem; border-top: 1px dashed var(--border-glass); padding-top: 1rem;">
+                <span style="font-size: 0.78rem; color: var(--text-dim); display: block; text-align: center; margin-bottom: 0.6rem;">Hızlı Demo Sürücü Girişi (Tek Tıkla Dene):</span>
+                <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                    <button class="btn btn-secondary" style="flex: 1; padding: 0.35rem 0.6rem; font-size: 0.78rem;" onclick="quickDemoLogin('u_can_rider')">🛵 Can (Naked)</button>
+                    <button class="btn btn-secondary" style="flex: 1; padding: 0.35rem 0.6rem; font-size: 0.78rem;" onclick="quickDemoLogin('u_kaan_apex')">🏎️ Kaan (Apex)</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Log Ride Time Modal Backdrop (Sürüş Süresi Kaydet) -->
+    <div class="modal-backdrop" id="logRideModalBackdrop">
+        <div class="modal-container" style="max-width: 480px; padding: 1.8rem;">
+            <button class="modal-close-btn" onclick="closeLogRideModal()"><i class="fa-solid fa-xmark"></i></button>
+
+            <div style="display: flex; align-items: center; gap: 0.8rem; margin-bottom: 1.2rem;">
+                <div class="logo-icon" style="width: 42px; height: 42px; font-size: 1.2rem; flex-shrink: 0;"><i class="fa-solid fa-stopwatch"></i></div>
+                <div>
+                    <h3 style="font-family: var(--font-heading); font-size: 1.3rem; font-weight: 800; color: var(--text-main);">Sürüş Süreni Kaydet</h3>
+                    <p style="font-size: 0.82rem; color: var(--primary); font-weight: 700;" id="logRideRouteTitle">Rota</p>
+                </div>
+            </div>
+
+            <form onsubmit="event.preventDefault(); submitLogRideForm();">
+                <input type="hidden" id="logRideRouteId" value="" />
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; margin-bottom: 1rem;">
+                    <div class="form-group">
+                        <label class="form-label">Sürüş Süresi (Saat)</label>
+                        <input type="number" id="logRideHours" class="form-input" min="0" max="48" value="1" placeholder="Saat" />
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Sürüş Süresi (Dakika)</label>
+                        <input type="number" id="logRideMins" class="form-input" min="0" max="59" value="15" placeholder="Dakika" />
+                    </div>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 1.2rem;">
+                    <label class="form-label">Sürüş Notun & Tecrüben (İsteğe Bağlı)</label>
+                    <textarea id="logRideNotes" class="form-textarea" rows="3" placeholder="Yol durumu, asfalt tutuşu, hava sıcaklığı veya viraj hissiyatı hakkında not düşün..."></textarea>
+                </div>
+
+                <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center; padding: 0.8rem;">
+                    <i class="fa-solid fa-trophy"></i> Süreyi Kaydet & XP Puan Kazan
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Rider Profile Modal Backdrop -->
+    <div class="modal-backdrop" id="profileModalBackdrop">
+        <div class="modal-container" style="max-width: 600px; padding: 1.8rem;" id="profileModalContent">
+            <!-- Dynamically Injected by auth.js -->
+        </div>
+    </div>
+
+    <!-- Top Riders Leaderboard Modal Backdrop -->
+    <div class="modal-backdrop" id="topRidersModalBackdrop">
+        <div class="modal-container" style="max-width: 580px; padding: 1.8rem;">
+            <button class="modal-close-btn" onclick="closeTopRidersModal()"><i class="fa-solid fa-xmark"></i></button>
+            <div style="display: flex; align-items: center; gap: 0.8rem; margin-bottom: 1.2rem; border-bottom: 1px solid var(--border-glass); padding-bottom: 0.8rem;">
+                <div class="logo-icon" style="width: 42px; height: 42px; font-size: 1.2rem; background: linear-gradient(135deg, #ffb700, #ff6b00);"><i class="fa-solid fa-trophy"></i></div>
+                <div>
+                    <h3 style="font-family: var(--font-heading); font-size: 1.35rem; font-weight: 800; color: var(--text-main);">🏆 Şampiyon Sürücüler Tablosu</h3>
+                    <p style="font-size: 0.82rem; color: var(--text-muted);">En yüksek XP puanına sahip motor sürücüleri sıralaması.</p>
+                </div>
+            </div>
+
+            <div id="topRidersListContainer" style="display: flex; flex-direction: column; gap: 0.6rem; max-height: 400px; overflow-y: auto;">
+                <!-- Dynamically Injected -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Standalone Route Review & Rating Modal Backdrop -->
+    <div class="modal-backdrop" id="routeReviewModalBackdrop">
+        <div class="modal-container" style="max-width: 680px; padding: 1.8rem;" id="routeReviewModalContainer">
+            <!-- Dynamically Injected by openRouteReviewModal -->
+        </div>
+    </div>
+
+
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <!-- Application JS Files -->
+    <script src="js/i18n.js"></script>
+    <script src="js/mock-data.js"></script>
+    <script src="js/map.js"></script>
+    <script src="js/route-builder.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/member-reviews.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
